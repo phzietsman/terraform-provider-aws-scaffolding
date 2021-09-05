@@ -2,9 +2,11 @@ package provider
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"log"
+	"net/http"
 )
 
 func dataSourceScaffolding() *schema.Resource {
@@ -25,12 +27,20 @@ func dataSourceScaffolding() *schema.Resource {
 	}
 }
 
-func dataSourceScaffoldingRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	// use the meta value to retrieve your client from the provider configure method
-	// client := meta.(*apiClient)
+func dataSourceScaffoldingRead(_ context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	client := meta.(*ApiClient)
+	statusCode, response, err := request(client, http.MethodGet, "resource", nil)
+
+	fmt.Println(fmt.Sprintf("statusCode:%d",statusCode))
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(string(response))
 
 	idFromAPI := "my-id"
 	d.SetId(idFromAPI)
 
-	return diag.Errorf("not implemented")
+	return diags
 }
